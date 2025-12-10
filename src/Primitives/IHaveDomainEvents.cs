@@ -1,5 +1,7 @@
 ﻿
 
+using Intec.Workshop1.Customers.Primitives;
+
 public interface IHaveDomainEvents
 {
     /// <summary>

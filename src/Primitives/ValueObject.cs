@@ -1,5 +1,7 @@
 ﻿
 
+namespace Intec.Workshop1.Customers.Primitives;
+
 public abstract class ValueObject : IEquatable<ValueObject>
 {
     public static bool operator ==(ValueObject? a, ValueObject? b)

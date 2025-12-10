@@ -1,4 +1,5 @@
-﻿
+﻿namespace Intec.Workshop1.Customers.Primitives;
+
 public abstract record Identity<TId>
 {
     protected Identity(TId value) => Value = value;

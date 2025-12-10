@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace DefaultNamespace;
+namespace Intec.Workshop1.Customers.Infrastructure;
 
 public class CustomersDbContext:DbContext
 {

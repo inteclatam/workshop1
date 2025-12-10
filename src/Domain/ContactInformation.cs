@@ -1,47 +1,46 @@
 using Ardalis.GuardClauses;
 using Intec.Workshop1.Customers.Domain.ValueObjects;
+using Intec.Workshop1.Customers.Primitives;
 
 namespace Intec.Workshop1.Customers.Domain;
 
-public  class ContactInformation:Entity<long>
+public class ContactInformation : Entity<long>
 {
-    public EMailAddress Email { get; set; }
-
-    public PhoneNumber? PhoneNumber { get; set; } = null!;
-    public bool IsVerified { get; set; }
+    // Ctor para EF
     public ContactInformation()
     {
-        
     }
 
-    public ContactInformation(EMailAddress email, PhoneNumber phoneNumber)
+    public EMailAddress Email { get; private set; } 
+    public PhoneNumber? PhoneNumber { get; private set; }
+    public bool IsVerified { get; private set; }
+
+    public void UpdateEmailAddress(string email)
     {
-        Guard.Against.Null(email, nameof(email));
-        Guard.Against.Null(phoneNumber, nameof(phoneNumber));
-       Email = email;
-       PhoneNumber = phoneNumber;
-    }
-    
-    public void Verify()
-    {
-        IsVerified = true;
-    }
-    public void UpdateEmailAddress(string newEmail)
-    {
-        Email= new EMailAddress( newEmail);
+        Guard.Against.NullOrWhiteSpace(email, nameof(email));
+
+        Email = new EMailAddress(email);
         IsVerified = false;
     }
 
     public void UpdatePhonenumber(string phoneNumber)
     {
-        var phone = phoneNumber.Split('+');
-        var number = phone[1];
+        Guard.Against.NullOrWhiteSpace(phoneNumber, nameof(phoneNumber));
+
+        // "57+3001234567"
+        var phone = phoneNumber.Split('+', StringSplitOptions.RemoveEmptyEntries);
+        if (phone.Length != 2)
+            throw new ArgumentException("Invalid prefix+number format", nameof(phoneNumber));
+
         var prefix = phone[0];
-        
-        PhoneNumber=new PhoneNumber(prefix,number);
+        var number = phone[1];
+
+        PhoneNumber = new PhoneNumber(number, prefix);
         IsVerified = false;
     }
 
-    
-    
+    public void Verify()
+    {
+        IsVerified = true;
+    }
 }
