@@ -1,12 +1,29 @@
-public class Customer:Entity, IHaveSoftDelete
+using Intec.Workshop1.Customers.Domain.ValueObjects;
+
+namespace Intec.Workshop1.Customers.Domain;
+
+public class Customer: Aggregate<CustomerId>,IHaveAudit, IHaveCreator, IHaveSoftDelete
 {
+    public Customer()
+    {
+        
+    }
+
     public CustomerId CustomerId { get; set; }
-
-
     public CustomerName Name{get;set;}
-    public EMailAddress Email { get; set; }
+public ContactInformation ContactInformation{get;set;}
+//Audit Info
+    public DateTime Created { get; }
+    public int? CreatedBy { get; }
+    public DateTime? LastModified { get; }
+    public int? LastModifiedBy { get; }
 
-    public PhoneNumber PhoneNumber { get; set; }
-
-    public DateTime CreatedAt { get; set; }
+    public void Create(CustomerName name,string email,
+        string phoneNumber)
+    {
+        Name = name;
+        ContactInformation.UpdateEmailAddress(email);
+        ContactInformation.UpdatePhonenumber(phoneNumber);
+    }
+   
 }

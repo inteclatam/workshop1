@@ -1,5 +1,4 @@
-﻿namespace MVCT.Terra.CommonV1.Domain.Primitives;
-
+﻿
 public abstract record Identity<TId>
 {
     protected Identity(TId value) => Value = value;

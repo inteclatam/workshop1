@@ -1,6 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 
-namespace MVCT.Terra.CommonV1.Domain.Primitives;
+namespace Intec.Workshop1.Customers.Primitives;
 
 public record AggregateId<T> : Identity<T>
 {
@@ -12,13 +12,13 @@ public record AggregateId<T> : Identity<T>
     public static implicit operator AggregateId<T>(T id) => new(id);
 }
 
-public record AggregateId : AggregateId<int>
+public record AggregateId : AggregateId<long>
 {
-    public AggregateId(int value) : base(value)
+    public AggregateId(long value) : base(value)
     {
         Guard.Against.NegativeOrZero(value, nameof(value));
     }
 
-    public static implicit operator int(AggregateId id) => Guard.Against.Null(id.Value, nameof(id.Value));
-    public static implicit operator AggregateId(int id) => new(id);
+    public static implicit operator long(AggregateId id) => Guard.Against.Null(id.Value, nameof(id.Value));
+    public static implicit operator AggregateId(long id) => new(id);
 }
