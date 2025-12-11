@@ -35,6 +35,8 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
 
     // Factory de dominio
     public static Customer Create(
+        long id,
+        long contactId,
         string firstName,
         string lastName,
         string email,
@@ -43,13 +45,14 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
     {
         var customer = new Customer
         {
+            Id = new CustomerId(id),
             Name = new CustomerName(firstName, lastName),
             Created = DateTime.UtcNow,
             CreatedBy = userId
         };
 
         // Agregar contacto principal
-        customer.AddContactInformation(email, phoneNumber, isPrimary: true);
+        customer.AddContactInformation(contactId, email, phoneNumber, isPrimary: true);
 
         return customer;
     }
@@ -62,7 +65,7 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
         Touch(userId);
     }
 
-    public ContactInformation AddContactInformation(string email, string phoneNumber, bool isPrimary = false, int? userId = null)
+    public ContactInformation AddContactInformation(long contactId, string email, string phoneNumber, bool isPrimary = false, int? userId = null)
     {
         // Si se marca como primario, desmarcar el anterior
         if (isPrimary)
@@ -74,6 +77,7 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
         }
 
         var contactInfo = new ContactInformation();
+        contactInfo.SetId(contactId);
         contactInfo.UpdateEmailAddress(email);
         contactInfo.UpdatePhonenumber(phoneNumber);
 

@@ -8,18 +8,19 @@ public class CustomerConfigurationMapping : IEntityTypeConfiguration<Customer>
 {
     public void Configure(EntityTypeBuilder<Customer> builder)
     {
-        // Configuración de la tabla
+        // Config tabla
         builder.ToTable("Customers");
 
-        // Configuración de la clave primaria (CustomerId es un value object)
+        builder.ToTable("Customers","customers");
+        // clave primaria (CustomerId es un value object)
         builder.HasKey(c => c.Id);
         builder.Property(c => c.Id)
             .HasConversion(
                 id => id.Value,
                 value => new CustomerId(value))
-            .ValueGeneratedOnAdd();
+            .ValueGeneratedNever();
 
-        // Configuración del value object CustomerName
+        // Config del value object CustomerName
         builder.OwnsOne(c => c.Name, nameBuilder =>
         {
             nameBuilder.Property(n => n.FullName)
@@ -28,7 +29,7 @@ public class CustomerConfigurationMapping : IEntityTypeConfiguration<Customer>
                 .IsRequired();
         });
 
-        // Configuración de propiedades de auditoría
+        // audit
         builder.Property(c => c.Created)
             .IsRequired();
 
@@ -38,7 +39,7 @@ public class CustomerConfigurationMapping : IEntityTypeConfiguration<Customer>
 
         builder.Property(c => c.LastModifiedBy);
 
-        // Configuración de soft delete
+        //  soft delete
         builder.Property(c => c.IsDeleted)
             .IsRequired()
             .HasDefaultValue(false);
@@ -47,16 +48,14 @@ public class CustomerConfigurationMapping : IEntityTypeConfiguration<Customer>
 
         builder.Property(c => c.DeletedBy);
 
-        // Configuración de la relación uno-a-muchos con ContactInformation
+        // Configuración de la relación 1:n ContactInformation
         builder.HasMany(c => c.ContactInformations)
             .WithOne()
             .HasForeignKey(ci => ci.CustomerId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Índice para consultas de soft delete
         builder.HasIndex(c => c.IsDeleted);
 
-        // Query filter para soft delete (opcional)
         builder.HasQueryFilter(c => !c.IsDeleted);
     }
 }

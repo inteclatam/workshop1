@@ -1,9 +1,12 @@
 namespace Intec.Workshop1.Customers.Domain.ValueObjects;
 
-public readonly record struct EMailAddress
+
+public sealed record EMailAddress
 {
-    
-    public string Value { get; }
+    public string Value { get; private set; }
+
+    // Ctor para EF (parámetroless)
+    private EMailAddress() { }
 
     public EMailAddress(string value)
     {
@@ -15,8 +18,4 @@ public readonly record struct EMailAddress
 
         Value = value;
     }
-
-    
-    
-   
 }
