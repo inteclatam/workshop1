@@ -1,6 +1,6 @@
 namespace Intec.Workshop1.Customers.Domain.ValueObjects;
 
-public record struct PhoneNumber
+public sealed record  PhoneNumber
 {
     public string Value { get; }
     public string Number { get; }
