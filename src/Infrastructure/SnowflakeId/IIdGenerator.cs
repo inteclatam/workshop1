@@ -1,4 +1,4 @@
-namespace Intec.Workshop1.Customers.Infrastructure;
+namespace Intec.Workshop1.Customers.Infrastructure.SnowflakeId;
 
 /// <summary>
 /// Interface for generating unique identifiers.

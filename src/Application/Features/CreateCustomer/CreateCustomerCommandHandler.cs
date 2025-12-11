@@ -1,6 +1,7 @@
 
 using Intec.Workshop1.Customers.Domain;
 using Intec.Workshop1.Customers.Infrastructure;
+using Intec.Workshop1.Customers.Infrastructure.SnowflakeId;
 using Intec.Workshop1.Customers.Primitives;
 
 namespace Intec.Workshop1.Customers.Application.Features.CreateCustomer;

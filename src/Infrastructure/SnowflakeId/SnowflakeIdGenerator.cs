@@ -1,6 +1,4 @@
-using IIdGenerator = Intec.Workshop1.Customers.Infrastructure.IIdGenerator;
-
-namespace Intec.Workshop1.Customers.Infrastructure;
+namespace Intec.Workshop1.Customers.Infrastructure.SnowflakeId;
 
 /// <summary>
 /// Implementation of IIdGenerator using Snowflake algorithm.

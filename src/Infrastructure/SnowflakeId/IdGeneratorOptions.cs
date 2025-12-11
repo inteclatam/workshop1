@@ -1,4 +1,4 @@
-namespace Intec.Workshop1.Customers.Infrastructure;
+namespace Intec.Workshop1.Customers.Infrastructure.SnowflakeId;
 
 /// <summary>
 /// Configuration options for ID generator.
