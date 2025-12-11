@@ -11,9 +11,13 @@ public class ContactInformation : Entity<long>
     {
     }
 
-    public EMailAddress Email { get; private set; } 
+    public EMailAddress Email { get; private set; }
     public PhoneNumber? PhoneNumber { get; private set; }
     public bool IsVerified { get; private set; }
+    public bool IsPrimary { get; private set; }
+
+    // Foreign Key
+    public long CustomerId { get; private set; }
 
     public void UpdateEmailAddress(string email)
     {
@@ -42,5 +46,20 @@ public class ContactInformation : Entity<long>
     public void Verify()
     {
         IsVerified = true;
+    }
+
+    public void SetAsPrimary()
+    {
+        IsPrimary = true;
+    }
+
+    public void UnsetPrimary()
+    {
+        IsPrimary = false;
+    }
+
+    public void SetCustomerId(long customerId)
+    {
+        CustomerId = customerId;
     }
 }

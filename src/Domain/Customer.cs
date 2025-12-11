@@ -12,13 +12,15 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
 
     public CustomerName Name { get; private set; } = null!;
 
-    // Información de contacto encapsulada
-    private ContactInformation ContactInformation { get; } = new();
+    // Información de contacto - Relación uno-a-muchos
+    private readonly List<ContactInformation> _contactInformations = new();
+    public IReadOnlyCollection<ContactInformation> ContactInformations => _contactInformations.AsReadOnly();
 
-    // Facade sobre ContactInformation
-    public EMailAddress Email => ContactInformation.Email;
-    public PhoneNumber? PhoneNumber => ContactInformation.PhoneNumber;
-    public bool IsContactVerified => ContactInformation.IsVerified;
+    // Propiedades de conveniencia para el contacto principal
+    public ContactInformation? PrimaryContact => _contactInformations.FirstOrDefault(c => c.IsPrimary);
+    public EMailAddress? Email => PrimaryContact?.Email;
+    public PhoneNumber? PhoneNumber => PrimaryContact?.PhoneNumber;
+    public bool IsContactVerified => PrimaryContact?.IsVerified ?? false;
 
     // Audit Info
     public DateTime Created { get; private set; }
@@ -46,8 +48,8 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
             CreatedBy = userId
         };
 
-        customer.ContactInformation.UpdateEmailAddress(email);
-        customer.ContactInformation.UpdatePhonenumber(phoneNumber);
+        // Agregar contacto principal
+        customer.AddContactInformation(email, phoneNumber, isPrimary: true);
 
         return customer;
     }
@@ -60,21 +62,91 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
         Touch(userId);
     }
 
-    public void UpdateEmail(string email, int? userId = null)
+    public ContactInformation AddContactInformation(string email, string phoneNumber, bool isPrimary = false, int? userId = null)
     {
-        ContactInformation.UpdateEmailAddress(email);
+        // Si se marca como primario, desmarcar el anterior
+        if (isPrimary)
+        {
+            foreach (var contact in _contactInformations)
+            {
+                contact.UnsetPrimary();
+            }
+        }
+
+        var contactInfo = new ContactInformation();
+        contactInfo.UpdateEmailAddress(email);
+        contactInfo.UpdatePhonenumber(phoneNumber);
+
+        if (isPrimary)
+        {
+            contactInfo.SetAsPrimary();
+        }
+
+        _contactInformations.Add(contactInfo);
+        Touch(userId);
+
+        return contactInfo;
+    }
+
+    public void UpdateContactEmail(long contactId, string email, int? userId = null)
+    {
+        var contact = _contactInformations.FirstOrDefault(c => c.Id == contactId);
+        if (contact == null)
+            throw new InvalidOperationException($"Contact information with id {contactId} not found");
+
+        contact.UpdateEmailAddress(email);
         Touch(userId);
     }
 
-    public void UpdatePhoneNumber(string phoneNumber, int? userId = null)
+    public void UpdateContactPhoneNumber(long contactId, string phoneNumber, int? userId = null)
     {
-        ContactInformation.UpdatePhonenumber(phoneNumber);
+        var contact = _contactInformations.FirstOrDefault(c => c.Id == contactId);
+        if (contact == null)
+            throw new InvalidOperationException($"Contact information with id {contactId} not found");
+
+        contact.UpdatePhonenumber(phoneNumber);
         Touch(userId);
     }
 
-    public void VerifyContact(int? userId = null)
+    public void SetPrimaryContact(long contactId, int? userId = null)
     {
-        ContactInformation.Verify();
+        var contact = _contactInformations.FirstOrDefault(c => c.Id == contactId);
+        if (contact == null)
+            throw new InvalidOperationException($"Contact information with id {contactId} not found");
+
+        // Desmarcar todos los contactos como primarios
+        foreach (var c in _contactInformations)
+        {
+            c.UnsetPrimary();
+        }
+
+        // Marcar el nuevo contacto como primario
+        contact.SetAsPrimary();
+        Touch(userId);
+    }
+
+    public void VerifyContact(long contactId, int? userId = null)
+    {
+        var contact = _contactInformations.FirstOrDefault(c => c.Id == contactId);
+        if (contact == null)
+            throw new InvalidOperationException($"Contact information with id {contactId} not found");
+
+        contact.Verify();
+        Touch(userId);
+    }
+
+    public void RemoveContactInformation(long contactId, int? userId = null)
+    {
+        var contact = _contactInformations.FirstOrDefault(c => c.Id == contactId);
+        if (contact == null)
+            throw new InvalidOperationException($"Contact information with id {contactId} not found");
+
+        if (contact.IsPrimary && _contactInformations.Count > 1)
+        {
+            throw new InvalidOperationException("Cannot remove primary contact. Set another contact as primary first.");
+        }
+
+        _contactInformations.Remove(contact);
         Touch(userId);
     }
 
