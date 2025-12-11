@@ -11,10 +11,10 @@ public class ContactInformationConfigurationMapping : IEntityTypeConfiguration<C
         // Config tabla
         builder.ToTable("ContactInformation","customers");
 
-     
+
         builder.HasKey(c => c.Id);
         builder.Property(c => c.Id)
-            .ValueGeneratedOnAdd();
+            .ValueGeneratedNever();
 
         // l value object Email
         builder.OwnsOne(c => c.Email, emailBuilder =>

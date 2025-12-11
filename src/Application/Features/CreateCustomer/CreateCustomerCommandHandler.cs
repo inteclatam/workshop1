@@ -8,15 +8,28 @@ namespace Intec.Workshop1.Customers.Application.Features.CreateCustomer;
 public class CreateCustomerCommandHandler:ICommandHandler<CreateCustomerCommand,CreateCustomerResponse>
 {
     private readonly ICustomerRepository _repository;
+    private readonly IIdGenerator _idGenerator;
 
-    public CreateCustomerCommandHandler(ICustomerRepository repository)
+    public CreateCustomerCommandHandler(ICustomerRepository repository, IIdGenerator idGenerator)
     {
-       _repository = repository; 
+       _repository = repository;
+       _idGenerator = idGenerator;
     }
+
     public async Task<CreateCustomerResponse> HandleAsync(CreateCustomerCommand command, CancellationToken ct = default)
     {
-        var customer = Customer.Create(command.FirstName, command.LastName, command.EMail, command.PhoneNumber);
+        var customerId = _idGenerator.GenerateId();
+        var contactId = _idGenerator.GenerateId();
+
+        var customer = Customer.Create(
+            customerId,
+            contactId,
+            command.FirstName,
+            command.LastName,
+            command.EMail,
+            command.PhoneNumber);
+
         await _repository.AddAsync(customer);
-        return new CreateCustomerResponse(customer.Name.FullName, customer.Email.Value,1);
+        return new CreateCustomerResponse(customer.Name.FullName, customer.Email!.Value, customerId);
     }
 }

@@ -18,7 +18,7 @@ public class CustomerConfigurationMapping : IEntityTypeConfiguration<Customer>
             .HasConversion(
                 id => id.Value,
                 value => new CustomerId(value))
-            .ValueGeneratedOnAdd();
+            .ValueGeneratedNever();
 
         // Config del value object CustomerName
         builder.OwnsOne(c => c.Name, nameBuilder =>
