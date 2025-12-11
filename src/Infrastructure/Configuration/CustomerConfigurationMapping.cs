@@ -1,6 +1,62 @@
-namespace DefaultNamespace.Configuration;
+using Intec.Workshop1.Customers.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-public class CustomerConfigurationMapping
+namespace Intec.Workshop1.Customers.Infrastructure.Configuration;
+
+public class CustomerConfigurationMapping : IEntityTypeConfiguration<Customer>
 {
-    
+    public void Configure(EntityTypeBuilder<Customer> builder)
+    {
+        // Configuración de la tabla
+        builder.ToTable("Customers");
+
+        // Configuración de la clave primaria (CustomerId es un value object)
+        builder.HasKey(c => c.Id);
+        builder.Property(c => c.Id)
+            .HasConversion(
+                id => id.Value,
+                value => new CustomerId(value))
+            .ValueGeneratedOnAdd();
+
+        // Configuración del value object CustomerName
+        builder.OwnsOne(c => c.Name, nameBuilder =>
+        {
+            nameBuilder.Property(n => n.FullName)
+                .HasColumnName("FullName")
+                .HasMaxLength(200)
+                .IsRequired();
+        });
+
+        // Configuración de propiedades de auditoría
+        builder.Property(c => c.Created)
+            .IsRequired();
+
+        builder.Property(c => c.CreatedBy);
+
+        builder.Property(c => c.LastModified);
+
+        builder.Property(c => c.LastModifiedBy);
+
+        // Configuración de soft delete
+        builder.Property(c => c.IsDeleted)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        builder.Property(c => c.Deleted);
+
+        builder.Property(c => c.DeletedBy);
+
+        // Configuración de la relación uno-a-muchos con ContactInformation
+        builder.HasMany(c => c.ContactInformations)
+            .WithOne()
+            .HasForeignKey(ci => ci.CustomerId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Índice para consultas de soft delete
+        builder.HasIndex(c => c.IsDeleted);
+
+        // Query filter para soft delete (opcional)
+        builder.HasQueryFilter(c => !c.IsDeleted);
+    }
 }

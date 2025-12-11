@@ -1,10 +1,9 @@
 using Intec.Workshop1.Customers.Domain;
 using Microsoft.EntityFrameworkCore;
-using ContactInformation = Intec.Workshop1.Customers.Infrastructure.Configuration.ContactInformation;
 
 namespace Intec.Workshop1.Customers.Infrastructure;
 
-public class CustomersDbContext:DbContext
+public class CustomersDbContext : DbContext
 {
     public CustomersDbContext(DbContextOptions<CustomersDbContext> options) : base(options)
     {
@@ -16,7 +15,8 @@ public class CustomersDbContext:DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // Aplicar todas las configuraciones del assembly
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CustomersDbContext).Assembly);
-        
     }
 }
