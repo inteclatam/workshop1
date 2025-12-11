@@ -17,6 +17,6 @@ public class CreateCustomerCommandHandler:ICommandHandler<CreateCustomerCommand,
     {
         var customer = Customer.Create(command.FirstName, command.LastName, command.EMail, command.PhoneNumber);
         await _repository.AddAsync(customer);
-        return new CreateCustomerResponse(customer.Name.FullName, customer.Email.Value);
+        return new CreateCustomerResponse(customer.Name.FullName, customer.Email.Value,1);
     }
 }

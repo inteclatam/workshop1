@@ -8,15 +8,15 @@ public class ContactInformationConfigurationMapping : IEntityTypeConfiguration<C
 {
     public void Configure(EntityTypeBuilder<ContactInformation> builder)
     {
-        // Configuración de la tabla
-        builder.ToTable("ContactInformations");
+        // Config tabla
+        builder.ToTable("ContactInformation","customers");
 
-        // Configuración de la clave primaria
+     
         builder.HasKey(c => c.Id);
         builder.Property(c => c.Id)
             .ValueGeneratedOnAdd();
 
-        // Configuración del value object Email
+        // l value object Email
         builder.OwnsOne(c => c.Email, emailBuilder =>
         {
             emailBuilder.Property(e => e.Value)
@@ -28,7 +28,7 @@ public class ContactInformationConfigurationMapping : IEntityTypeConfiguration<C
                 .IsUnique();
         });
 
-        // Configuración del value object PhoneNumber
+        // value object PhoneNumber
         builder.OwnsOne(c => c.PhoneNumber, phoneBuilder =>
         {
             phoneBuilder.Property(p => p.Number)
@@ -47,7 +47,6 @@ public class ContactInformationConfigurationMapping : IEntityTypeConfiguration<C
                 .IsRequired();
         });
 
-        // Configuración de propiedades
         builder.Property(c => c.IsVerified)
             .IsRequired()
             .HasDefaultValue(false);
@@ -59,7 +58,6 @@ public class ContactInformationConfigurationMapping : IEntityTypeConfiguration<C
         builder.Property(c => c.CustomerId)
             .IsRequired();
 
-        // Índices
         builder.HasIndex(c => c.CustomerId);
         builder.HasIndex(c => c.IsPrimary);
     }
