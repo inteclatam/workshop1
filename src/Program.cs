@@ -1,5 +1,5 @@
-using IdGenerator;
 using Intec.Workshop1.Customers.Infrastructure;
+using Intec.Workshop1.Customers.Infrastructure.SnowflakeId;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,17 +11,16 @@ builder.Services.AddOpenApi();
 var workerId = builder.Configuration.GetValue<ushort>("IdGenerator:WorkerId");
 var datacenterId = builder.Configuration.GetValue<ushort>("IdGenerator:DatacenterId");
 
-/*
+
 var idGeneratorOptions = new IdGeneratorOptions
 {
     WorkerId = workerId,
-    DataCenterId = datacenterId
+    DatacenterId = datacenterId
     };
-*/
 
 
-//builder.Services.AddSingleton<>(sp => new DefaultIdGeneratorPool(idGeneratorOptions));
-//builder.Services.AddSingleton<IIdGenerator, SnowflakeIdGenerator>();
+builder.Services.AddSingleton<IIdGeneratorPool>(sp => new DefaultIdGeneratorPool(idGeneratorOptions));
+builder.Services.AddSingleton<IIdGenerator, SnowflakeIdGenerator>();
 
 var app = builder.Build();
 
@@ -58,3 +57,5 @@ record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
+
+
