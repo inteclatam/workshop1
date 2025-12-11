@@ -1,4 +1,4 @@
-namespace customers.Infrastructure;
+namespace Intec.Workshop1.Customers.Infrastructure;
 
 /// <summary>
 /// Interface for generating unique identifiers.
