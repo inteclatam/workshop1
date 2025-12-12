@@ -62,4 +62,9 @@ public class ContactInformation : Entity<long>
     {
         CustomerId = customerId;
     }
+
+    public void SetId(long id)
+    {
+        Id = id;
+    }
 }

@@ -76,10 +76,8 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
             }
         }
 
-        var contactInfo = new ContactInformation
-        {
-            Id = contactId
-        };
+        var contactInfo = new ContactInformation();
+        contactInfo.SetId(contactId);
         contactInfo.UpdateEmailAddress(email);
         contactInfo.UpdatePhonenumber(phoneNumber);
 
