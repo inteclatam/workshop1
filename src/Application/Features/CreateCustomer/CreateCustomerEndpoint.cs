@@ -20,10 +20,9 @@ public static class CreateCustomerEndpoint
 
             var result = await dispatcher.DispatchAsync<CreateCustomerResponse>(command, cancellationToken);
 
-            return Results.Created($"/api/customers/{result.CustomerId}", result);
+            return Results.Created($"/api/customers/{result.Id}", result);
         })
         .AddEndpointFilter<ValidationFilter>()
-        .WithOpenApi()
         .WithName("CreateCustomer")
         .WithTags("Customers")
         .Produces<CreateCustomerResponse>(StatusCodes.Status201Created)

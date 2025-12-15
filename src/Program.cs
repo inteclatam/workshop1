@@ -33,8 +33,8 @@ builder.Services.AddProblemDetails();
 
 // Logging
 builder.Host.UseSerilog(
-    (context, configuration)
-        => configuration.ReadFrom.Configuration(context.Configuration));
+    (context, loggerConfiguration)
+        => loggerConfiguration.ReadFrom.Configuration(context.Configuration));
 var app = builder.Build();
 
 // Exception handling middleware
