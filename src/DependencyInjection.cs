@@ -53,6 +53,9 @@ public static class DependencyInjection
         // Filters
         services.AddScoped<ValidationFilter>();
 
+        // Database Seeder
+        services.AddScoped<CustomersDbContextSeed>();
+
         return services;
     }
 

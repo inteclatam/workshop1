@@ -41,6 +41,16 @@ var app = builder.Build();
 // Exception handling middleware
 app.UseExceptionHandler();
 
+// Seed database in development
+if (app.Environment.IsDevelopment())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var seeder = scope.ServiceProvider.GetRequiredService<CustomersDbContextSeed>();
+        await seeder.SeedAsync();
+    }
+}
+
 app.MapOpenApi();
 
 if (app.Environment.IsDevelopment())

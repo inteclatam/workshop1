@@ -1,4 +1,5 @@
 using Intec.Workshop1.Customers.Domain;
+using Intec.Workshop1.Customers.Infrastructure.Configuration;
 using Microsoft.EntityFrameworkCore;
 
 namespace Intec.Workshop1.Customers.Infrastructure;
@@ -18,5 +19,8 @@ public class CustomersDbContext : DbContext
 
         // Aplicar todas las configuraciones del assembly
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CustomersDbContext).Assembly);
+
+        // Aplicar seeds de datos
+        DatabaseSeeder.SeedData(modelBuilder);
     }
 }
