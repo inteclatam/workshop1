@@ -22,9 +22,14 @@ public class CustomerConfigurationMapping : IEntityTypeConfiguration<Customer>
         // Config del value object CustomerName
         builder.OwnsOne(c => c.Name, nameBuilder =>
         {
-            nameBuilder.Property(n => n.FullName)
-                .HasColumnName("FullName")
-                .HasMaxLength(200)
+            nameBuilder.Property(n => n.FirstName)
+                .HasColumnName("FirstName")
+                .HasMaxLength(100)
+                .IsRequired();
+
+            nameBuilder.Property(n => n.LastName)
+                .HasColumnName("LastName")
+                .HasMaxLength(100)
                 .IsRequired();
         });
 

@@ -4,13 +4,13 @@ namespace Intec.Workshop1.Customers.Domain.ValueObjects;
 
 public sealed record CustomerName
 {
-    private string FirstName { get; }
-    private string LastName  { get; }
+    public string FirstName { get; private set; } = string.Empty;
+    public string LastName  { get; private set; } = string.Empty;
     public string FullName  => $"{FirstName} {LastName}";
 
     public CustomerName()
     {
-        
+
     }
     public CustomerName(string firstName, string lastName)
     {
