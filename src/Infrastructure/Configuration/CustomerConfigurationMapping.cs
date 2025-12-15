@@ -48,14 +48,10 @@ public class CustomerConfigurationMapping : IEntityTypeConfiguration<Customer>
         builder.Property(c => c.DeletedBy);
 
         // Configuración de la relación 1:n ContactInformation
-
-        builder.Property(c => c.Id)
-            .HasConversion(new CustomerIdConverter())
-            .ValueGeneratedNever();
-        
         builder.HasMany(c => c.ContactInformations)
             .WithOne()
             .HasForeignKey(ci => ci.CustomerId)
+            .HasPrincipalKey(c => c.Id)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(c => c.IsDeleted);

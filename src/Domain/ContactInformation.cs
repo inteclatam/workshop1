@@ -16,8 +16,8 @@ public class ContactInformation : Entity<long>
     public bool IsVerified { get; private set; }
     public bool IsPrimary { get; private set; }
 
-    // Foreign Key
-    public long CustomerId { get; private set; }
+    // Foreign Key - matches Customer.Id type
+    public CustomerId CustomerId { get; private set; } = null!;
 
     public void UpdateEmailAddress(string email)
     {
@@ -58,7 +58,7 @@ public class ContactInformation : Entity<long>
         IsPrimary = false;
     }
 
-    public void SetCustomerId(long customerId)
+    public void SetCustomerId(CustomerId customerId)
     {
         CustomerId = customerId;
     }

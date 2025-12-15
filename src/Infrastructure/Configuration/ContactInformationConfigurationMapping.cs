@@ -55,7 +55,9 @@ public class ContactInformationConfigurationMapping : IEntityTypeConfiguration<C
             .IsRequired()
             .HasDefaultValue(false);
 
+        // Configure foreign key with same conversion as Customer.Id
         builder.Property(c => c.CustomerId)
+            .HasConversion(new CustomerIdConverter())
             .IsRequired();
 
         builder.HasIndex(c => c.CustomerId);
