@@ -15,7 +15,6 @@ public class ContactInformationConfigurationMapping : IEntityTypeConfiguration<C
         builder.HasKey(c => c.Id);
         builder.Property(c => c.Id)
             .ValueGeneratedNever();
-
         // l value object Email
         builder.OwnsOne(c => c.Email, emailBuilder =>
         {

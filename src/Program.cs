@@ -1,6 +1,7 @@
 using Intec.Workshop1.Customers;
 using Intec.Workshop1.Customers.Application.Features.CreateCustomer;
 using Intec.Workshop1.Customers.Infrastructure.SnowflakeId;
+using Scalar.AspNetCore;
 using Serilog;
 using Spectre.Console;
 
@@ -29,12 +30,13 @@ builder.Host.UseSerilog(
         => configuration.ReadFrom.Configuration(context.Configuration));
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
+app.MapOpenApi();
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapScalarApiReference();
 }
-
 //app.UseHttpsRedirection();
 
 app.MapCreateCustomerEndpoint();

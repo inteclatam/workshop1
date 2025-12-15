@@ -25,7 +25,6 @@ public static class DependencyInjection
         };
         services.AddSingleton<IIdGeneratorPool>(sp => new DefaultIdGeneratorPool(idGeneratorOptions));
         services.AddSingleton<IIdGenerator, SnowflakeIdGenerator>();
-
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 

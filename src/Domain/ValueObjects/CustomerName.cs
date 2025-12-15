@@ -8,6 +8,10 @@ public sealed record CustomerName
     private string LastName  { get; }
     public string FullName  => $"{FirstName} {LastName}";
 
+    public CustomerName()
+    {
+        
+    }
     public CustomerName(string firstName, string lastName)
     {
         Guard.Against.NullOrEmpty(firstName, nameof(firstName));
