@@ -9,11 +9,18 @@ namespace Intec.Workshop1.Customers.Application.Features.CreateCustomer;
 public class CreateCustomerCommandHandler:ICommandHandler<CreateCustomerCommand,CreateCustomerResponse>
 {
     private readonly ICustomerRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IIdGenerator _idGenerator;
     private readonly ILogger<CreateCustomerCommandHandler> _logger;
-    public CreateCustomerCommandHandler(ICustomerRepository repository, IIdGenerator idGenerator,ILogger<CreateCustomerCommandHandler> logger)
+
+    public CreateCustomerCommandHandler(
+        ICustomerRepository repository,
+        IUnitOfWork unitOfWork,
+        IIdGenerator idGenerator,
+        ILogger<CreateCustomerCommandHandler> logger)
     {
        _repository = repository;
+       _unitOfWork = unitOfWork;
        _idGenerator = idGenerator;
        _logger = logger;
     }
@@ -23,6 +30,8 @@ public class CreateCustomerCommandHandler:ICommandHandler<CreateCustomerCommand,
         var customerId = _idGenerator.GenerateId();
         var contactId = _idGenerator.GenerateId();
 
+        _logger.LogInformation("Creating customer with ID: {CustomerId}", customerId);
+
         var customer = Customer.Create(
             customerId,
             contactId,
@@ -31,7 +40,11 @@ public class CreateCustomerCommandHandler:ICommandHandler<CreateCustomerCommand,
             command.EMail,
             command.PhoneNumber);
 
-        await _repository.AddAsync(customer);
+        await _repository.AddAsync(customer, ct);
+        await _unitOfWork.SaveChangesAsync(ct);
+
+        _logger.LogInformation("Customer created successfully with ID: {CustomerId}", customerId);
+
         return new CreateCustomerResponse(customer.Name.FullName, customer.Email!.Value, customerId);
     }
 }
