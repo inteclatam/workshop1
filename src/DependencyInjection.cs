@@ -1,4 +1,5 @@
 using Intec.Workshop1.Customers.Infrastructure;
+using Intec.Workshop1.Customers.Infrastructure.Data;
 using Intec.Workshop1.Customers.Infrastructure.SnowflakeId;
 using Intec.Workshop1.Customers.Infrastructure.Filters;
 using Intec.Workshop1.Customers.Primitives;
@@ -32,6 +33,9 @@ public static class DependencyInjection
         // Repository & Unit of Work
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+        // Data Seeder
+        services.AddScoped<CustomerSeeder>();
 
         // CQRS Dispatchers
         services.AddScoped<CommandDispatcher>();
