@@ -1,6 +1,6 @@
 using Intec.Workshop1.Customers;
 using Intec.Workshop1.Customers.Application.Features.CreateCustomer;
-using Intec.Workshop1.Customers.Infrastructure;
+using Intec.Workshop1.Customers.Application.Features.SeedData;
 using Intec.Workshop1.Customers.Infrastructure.SnowflakeId;
 using Intec.Workshop1.Customers.Infrastructure.Exceptions;
 using Scalar.AspNetCore;
@@ -60,5 +60,12 @@ if (app.Environment.IsDevelopment())
 //app.UseHttpsRedirection();
 
 app.MapCreateCustomerEndpoint();
+
+// Development endpoints
+if (app.Environment.IsDevelopment())
+{
+    app.MapSeedDataEndpoint();
+}
+
 app.Run();
 
