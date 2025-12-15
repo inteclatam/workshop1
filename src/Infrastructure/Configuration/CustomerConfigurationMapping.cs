@@ -9,7 +9,6 @@ public class CustomerConfigurationMapping : IEntityTypeConfiguration<Customer>
     public void Configure(EntityTypeBuilder<Customer> builder)
     {
         // Config tabla
-        builder.ToTable("Customers");
 
         builder.ToTable("Customers","customers");
         // clave primaria (CustomerId es un value object)

@@ -28,6 +28,7 @@ public class ContactInformationConfigurationMapping : IEntityTypeConfiguration<C
                 .IsUnique();
         });
 
+        
         // value object PhoneNumber
         builder.OwnsOne(c => c.PhoneNumber, phoneBuilder =>
         {

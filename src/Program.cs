@@ -1,27 +1,32 @@
+using Intec.Workshop1.Customers;
 using Intec.Workshop1.Customers.Application.Features.CreateCustomer;
 using Intec.Workshop1.Customers.Infrastructure.SnowflakeId;
+using Serilog;
+using Spectre.Console;
 
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?? "Development";
 var builder = WebApplication.CreateBuilder(args);
+var configuration=builder.Configuration
+    .AddJsonFile("appsettings.json",optional:false,reloadOnChange:true)
+    .AddEnvironmentVariables().Build();
+
+DisplayHeader(environment);
+
+void DisplayHeader(string environmentName,string applicationName="Customers Api")
+{
+    AnsiConsole.Write(
+        new FigletText(applicationName)
+            .LeftJustified()
+            .Color(Color.Green));
+}
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
-// Configure IdGenerator (Snowflake)
-var workerId = builder.Configuration.GetValue<ushort>("IdGenerator:WorkerId");
-var datacenterId = builder.Configuration.GetValue<ushort>("IdGenerator:DatacenterId");
-
-
-var idGeneratorOptions = new IdGeneratorOptions
-{
-    WorkerId = workerId,
-    DatacenterId = datacenterId
-};
-
-
-builder.Services.AddSingleton<IIdGeneratorPool>(sp => new DefaultIdGeneratorPool(idGeneratorOptions));
-builder.Services.AddSingleton<IIdGenerator, SnowflakeIdGenerator>();
-
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Host.UseSerilog(
+    (context, configuration) 
+        => configuration.ReadFrom.Configuration(context.Configuration));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -30,7 +35,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.MapCreateCustomerEndpoint();
 app.Run();

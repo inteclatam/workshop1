@@ -10,11 +10,12 @@ public class CreateCustomerCommandHandler:ICommandHandler<CreateCustomerCommand,
 {
     private readonly ICustomerRepository _repository;
     private readonly IIdGenerator _idGenerator;
-
-    public CreateCustomerCommandHandler(ICustomerRepository repository, IIdGenerator idGenerator)
+    private readonly ILogger<CreateCustomerCommandHandler> _logger;
+    public CreateCustomerCommandHandler(ICustomerRepository repository, IIdGenerator idGenerator,ILogger<CreateCustomerCommandHandler> logger)
     {
        _repository = repository;
        _idGenerator = idGenerator;
+       _logger = logger;
     }
 
     public async Task<CreateCustomerResponse> HandleAsync(CreateCustomerCommand command, CancellationToken ct = default)
