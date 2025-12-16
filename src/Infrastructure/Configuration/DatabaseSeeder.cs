@@ -1,4 +1,5 @@
 using Bogus;
+using Intec.Workshop1.Customers.Domain;
 using Microsoft.EntityFrameworkCore;
 using Intec.Workshop1.Customers.Infrastructure.SnowflakeId;
 
@@ -94,14 +95,7 @@ public static class DatabaseSeeder
         }
 
         // Aplicar el seed a través de HasData
-        modelBuilder.Entity("Intec.Workshop1.Customers.Domain.Customer", b =>
-        {
-            b.HasData(customerSeeds);
-        });
-
-        modelBuilder.Entity("Intec.Workshop1.Customers.Domain.ContactInformation", b =>
-        {
-            b.HasData(contactSeeds);
-        });
+        modelBuilder.Entity<Customer>().HasData(customerSeeds);
+        modelBuilder.Entity<ContactInformation>().HasData(contactSeeds);
     }
 }

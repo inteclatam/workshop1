@@ -1,5 +1,4 @@
 using Ardalis.GuardClauses;
-using Intec.Workshop1.Customers.Application.Features.CreateCustomer;
 using Intec.Workshop1.Customers.Infrastructure.Filters;
 using Intec.Workshop1.Customers.Primitives;
 
