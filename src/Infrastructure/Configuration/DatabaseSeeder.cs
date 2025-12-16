@@ -64,7 +64,7 @@ public static class DatabaseSeeder
                 Email = primaryEmail,
                 PhoneNumber = primaryPhoneNumber,
                 PhonePrefix = primaryPhonePrefix,
-                PhoneValue = $"{primaryPhonePrefix}{primaryPhoneNumber}",
+                PhoneValue = $"{primaryPhonePrefix}+{primaryPhoneNumber}",
                 IsVerified = faker.Random.Bool(0.7f), // 70% verificados para contacto principal
                 IsPrimary = true,
                 CustomerId = customerId
@@ -85,7 +85,7 @@ public static class DatabaseSeeder
                     Email = additionalEmail,
                     PhoneNumber = additionalPhoneNumber,
                     PhonePrefix = additionalPhonePrefix,
-                    PhoneValue = $"{additionalPhonePrefix}{additionalPhoneNumber}",
+                    PhoneValue = $"{additionalPhonePrefix}+{additionalPhoneNumber}",
                     IsVerified = faker.Random.Bool(0.3f), // 30% verificados
                     IsPrimary = false,
                     CustomerId = customerId
