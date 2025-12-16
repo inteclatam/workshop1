@@ -62,8 +62,10 @@ public static class DatabaseSeeder
             contactSeeds.Add(new
             {
                 Id = primaryContactId,
-                Email = new EMailAddress(primaryEmail),
-                PhoneNumber = new PhoneNumber(primaryPhoneNumber, primaryPhonePrefix),
+                Email_Value = primaryEmail,
+                PhoneNumber_Number = primaryPhoneNumber,
+                PhoneNumber_Prefix = primaryPhonePrefix,
+                PhoneNumber_Value = $"{primaryPhonePrefix}{primaryPhoneNumber}",
                 IsVerified = faker.Random.Bool(0.7f), // 70% verificados para contacto principal
                 IsPrimary = true,
                 CustomerId = new CustomerId(customerId)
@@ -81,8 +83,10 @@ public static class DatabaseSeeder
                 contactSeeds.Add(new
                 {
                     Id = additionalContactId,
-                    Email = new EMailAddress(additionalEmail),
-                    PhoneNumber = new PhoneNumber(additionalPhoneNumber, additionalPhonePrefix),
+                    Email_Value = additionalEmail,
+                    PhoneNumber_Number = additionalPhoneNumber,
+                    PhoneNumber_Prefix = additionalPhonePrefix,
+                    PhoneNumber_Value = $"{additionalPhonePrefix}{additionalPhoneNumber}",
                     IsVerified = faker.Random.Bool(0.3f), // 30% verificados
                     IsPrimary = false,
                     CustomerId = new CustomerId(customerId)
