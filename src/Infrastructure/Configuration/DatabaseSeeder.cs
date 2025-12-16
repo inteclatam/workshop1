@@ -39,11 +39,12 @@ public static class DatabaseSeeder
             var created = faker.Date.Between(new DateTime(2023, 1, 1), DateTime.UtcNow);
             var createdBy = faker.Random.Int(1, 100);
 
-            // Customer seed
+            // Customer seed - use flattened properties for owned entity Name
             customerSeeds.Add(new
             {
                 Id = new CustomerId(customerId),
-                Name = new CustomerName(firstName, lastName),
+                Name_FirstName = firstName,
+                Name_LastName = lastName,
                 Created = created,
                 CreatedBy = (int?)createdBy,
                 LastModified = (DateTime?)null,
