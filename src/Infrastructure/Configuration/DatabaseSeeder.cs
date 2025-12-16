@@ -1,5 +1,6 @@
 using Bogus;
 using Intec.Workshop1.Customers.Domain;
+using Intec.Workshop1.Customers.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Intec.Workshop1.Customers.Infrastructure.SnowflakeId;
 
@@ -41,9 +42,8 @@ public static class DatabaseSeeder
             // Customer seed
             customerSeeds.Add(new
             {
-                Id = customerId,
-                FirstName = firstName,
-                LastName = lastName,
+                Id = new CustomerId(customerId),
+                Name = new CustomerName(firstName, lastName),
                 Created = created,
                 CreatedBy = (int?)createdBy,
                 LastModified = (DateTime?)null,
@@ -62,13 +62,11 @@ public static class DatabaseSeeder
             contactSeeds.Add(new
             {
                 Id = primaryContactId,
-                Email = primaryEmail,
-                PhoneNumber = primaryPhoneNumber,
-                PhonePrefix = primaryPhonePrefix,
-                PhoneValue = $"{primaryPhonePrefix}+{primaryPhoneNumber}",
+                Email = new EMailAddress(primaryEmail),
+                PhoneNumber = new PhoneNumber(primaryPhoneNumber, primaryPhonePrefix),
                 IsVerified = faker.Random.Bool(0.7f), // 70% verificados para contacto principal
                 IsPrimary = true,
-                CustomerId = customerId
+                CustomerId = new CustomerId(customerId)
             });
 
             // Contactos adicionales (0-2 por customer)
@@ -83,13 +81,11 @@ public static class DatabaseSeeder
                 contactSeeds.Add(new
                 {
                     Id = additionalContactId,
-                    Email = additionalEmail,
-                    PhoneNumber = additionalPhoneNumber,
-                    PhonePrefix = additionalPhonePrefix,
-                    PhoneValue = $"{additionalPhonePrefix}+{additionalPhoneNumber}",
+                    Email = new EMailAddress(additionalEmail),
+                    PhoneNumber = new PhoneNumber(additionalPhoneNumber, additionalPhonePrefix),
                     IsVerified = faker.Random.Bool(0.3f), // 30% verificados
                     IsPrimary = false,
-                    CustomerId = customerId
+                    CustomerId = new CustomerId(customerId)
                 });
             }
         }
