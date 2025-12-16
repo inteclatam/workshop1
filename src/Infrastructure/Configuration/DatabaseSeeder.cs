@@ -36,7 +36,9 @@ public static class DatabaseSeeder
             var customerId = idGenerator.GenerateId();
             var firstName = faker.Name.FirstName();
             var lastName = faker.Name.LastName();
-            var created = faker.Date.Between(new DateTime(2023, 1, 1), DateTime.UtcNow);
+            var created = DateTime.SpecifyKind(
+                faker.Date.Between(new DateTime(2023, 1, 1), DateTime.UtcNow),
+                DateTimeKind.Utc);
             var createdBy = faker.Random.Int(1, 100);
 
             // Customer seed - use flattened properties for owned entity Name
