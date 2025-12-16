@@ -1,3 +1,4 @@
+using Ardalis.GuardClauses;
 using Intec.Workshop1.Customers.Application.Features.CreateCustomer;
 using Intec.Workshop1.Customers.Infrastructure.Filters;
 using Intec.Workshop1.Customers.Primitives;
@@ -9,23 +10,25 @@ public static class GetCustomerByIdEndpoint
 {
     public static IEndpointRouteBuilder MapGetCustomerByIdEndpoint(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapPost("/api/customers/{id}", async(
-                GetCustomerByIdQuery query,
-                CommandDispatcher dispatcher,
+        endpoints.MapGet("/api/customers/{id:long}", async (
+                long id,
+                QueryDispatcher dispatcher,
                 CancellationToken cancellationToken) =>
             {
-          
+                Guard.Against.NegativeOrZero(id, nameof(id));
 
-         //       var result = await dispatcher.DispatchAsync<GetCustomerByIdQueryResponse>(query, cancellationToken);
-//if(result==null) return Results.NotFound();
+                var query = new GetCustomerByIdQuery(id);
+                var result = await dispatcher.DispatchAsync<GetCustomerByIdResponse>(query, cancellationToken);
 
-                return Results.Ok();
+                return result is null
+                    ? Results.NotFound()
+                    : Results.Ok(result);
             })
             .AddEndpointFilter<ValidationFilter>()
-            .WithName("CreateCustomer")
+            .WithName("GetCustomerById")
             .WithTags("Customers")
-            .Produces<CreateCustomerResponse>(StatusCodes.Status201Created)
-            .ProducesValidationProblem();
+            .Produces<GetCustomerByIdResponse>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound);
 
         return endpoints;
     }

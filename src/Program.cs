@@ -1,5 +1,6 @@
 using Intec.Workshop1.Customers;
 using Intec.Workshop1.Customers.Application.Features.CreateCustomer;
+using Intec.Workshop1.Customers.Application.Features.GetCustomerById;
 using Intec.Workshop1.Customers.Infrastructure.Configuration;
 using Intec.Workshop1.Customers.Infrastructure.SnowflakeId;
 using Intec.Workshop1.Customers.Infrastructure.Exceptions;
@@ -52,7 +53,7 @@ app.MapOpenApi();
 //app.UseHttpsRedirection();
 
 app.MapCreateCustomerEndpoint();
-
+app.MapGetCustomerByIdEndpoint();
 
 
 app.Run();

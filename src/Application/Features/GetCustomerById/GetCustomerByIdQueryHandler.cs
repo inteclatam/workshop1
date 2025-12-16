@@ -4,21 +4,29 @@ using Intec.Workshop1.Customers.Primitives;
 
 namespace Intec.Workshop1.Customers.Application.Features.GetCustomerById;
 
-/*
-public class GetCustomerByIdQueryHandler:IQueryHandler<GetCustomerByIdQuery,GetCustomerByIdQueryResponse>
-{
-    public GetCustomerByIdQueryHandler(ICustomerRepository repository,)
+    public class GetCustomerByIdQueryHandler : IQueryHandler<GetCustomerByIdQuery, GetCustomerByIdResponse>
     {
-        _repository = repository;
-    }
-    private readonly ICustomerRepository _repository;
-    public async Task<GetCustomerByIdQueryResponse> HandleAsync(GetCustomerByIdQuery query, CancellationToken ct = default)
-    {
-        var customerId = new CustomerId(query.Id);
-        var customer = await _repository.GetByIdAsync(customerId, ct);
-        var response = new GetCustomerByIdQueryResponse
-            (FullName:customer!.Name.FullName,customer.Email!.Value, customer.PhoneNumber!.Value);
+        private readonly ICustomerRepository _repository;
 
-        return response;
+        public GetCustomerByIdQueryHandler(ICustomerRepository repository )
+        {
+            _repository = repository;
+        }
+
+         public async Task<GetCustomerByIdResponse> HandleAsync(GetCustomerByIdQuery request, CancellationToken ct = default)
+        {
+            var id = new CustomerId(request.Id);
+            var customer = await _repository.GetByIdAsync(id,ct);
+            if (customer == null)
+            {
+                
+            }
+
+            return new GetCustomerByIdResponse(
+                customer!.Name.FullName,
+                customer.Email!.Value,
+                customer.PhoneNumber!.Value
+            );
+
+        }
     }
-}*/
