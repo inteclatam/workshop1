@@ -3,7 +3,7 @@ namespace Intec.Workshop1.Customers.Domain.ValueObjects;
 
 public sealed record EMailAddress
 {
-    public string Value { get; private set; }
+    public string Value { get; private set; } = null!;
 
     // Ctor para EF (parámetroless)
     private EMailAddress() { }

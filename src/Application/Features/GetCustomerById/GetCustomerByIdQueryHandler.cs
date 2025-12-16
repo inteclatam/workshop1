@@ -19,13 +19,13 @@ namespace Intec.Workshop1.Customers.Application.Features.GetCustomerById;
             var customer = await _repository.GetByIdAsync(id,ct);
             if (customer == null)
             {
-                
+                return null!;
             }
 
             return new GetCustomerByIdResponse(
-                customer!.Name.FullName,
-                customer.Email!.Value,
-                customer.PhoneNumber!.Value
+                customer.Name.FullName,
+                customer.Email?.Value ?? string.Empty,
+                customer.PhoneNumber?.Value ?? string.Empty
             );
 
         }

@@ -11,7 +11,7 @@ public class ContactInformation : Entity<long>
     {
     }
 
-    public EMailAddress Email { get; private set; }
+    public EMailAddress? Email { get; private set; }
     public PhoneNumber? PhoneNumber { get; private set; }
     public bool IsVerified { get; private set; }
     public bool IsPrimary { get; private set; }

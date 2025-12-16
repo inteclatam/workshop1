@@ -20,8 +20,7 @@ public class ContactInformationConfigurationMapping : IEntityTypeConfiguration<C
         {
             emailBuilder.Property(e => e.Value)
                 .HasColumnName("Email")
-                .HasMaxLength(255)
-                .IsRequired();
+                .HasMaxLength(255);
 
             emailBuilder.HasIndex(e => e.Value)
                 .IsUnique();
@@ -33,18 +32,15 @@ public class ContactInformationConfigurationMapping : IEntityTypeConfiguration<C
         {
             phoneBuilder.Property(p => p.Number)
                 .HasColumnName("PhoneNumber")
-                .HasMaxLength(20)
-                .IsRequired();
+                .HasMaxLength(20);
 
             phoneBuilder.Property(p => p.Prefix)
                 .HasColumnName("PhonePrefix")
-                .HasMaxLength(10)
-                .IsRequired();
+                .HasMaxLength(10);
 
             phoneBuilder.Property(p => p.Value)
                 .HasColumnName("PhoneValue")
-                .HasMaxLength(30)
-                .IsRequired();
+                .HasMaxLength(30);
         });
 
         builder.Property(c => c.IsVerified)
