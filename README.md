@@ -1,5 +1,5 @@
 # Domain-Driven Design (DDD) - Customers
-
+<img src="https://img.shields.io/badge/.NET-5C2D91?style=badge&logo=.net&logoColor=white" >
 Este proyecto implementa una arquitectura basada en **Domain-Driven Design (DDD)** para la gestión de clientes, siguiendo los patrones tácticos y estratégicos de DDD.
 
 ## Estructura del Proyecto
