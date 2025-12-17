@@ -71,7 +71,7 @@ public static class DatabaseSeeder
                 PhoneValue = $"{primaryPhonePrefix}+{primaryPhoneNumber}",
                 IsVerified = faker.Random.Bool(0.7f), // 70% verificados para contacto principal
                 IsPrimary = true,
-                CustomerId = customerId
+                CustomerId = new CustomerId(customerId)
             });
 
             // Contactos adicionales (0-2 por customer)
@@ -92,7 +92,7 @@ public static class DatabaseSeeder
                     PhoneValue = $"{additionalPhonePrefix}+{additionalPhoneNumber}",
                     IsVerified = faker.Random.Bool(0.3f), // 30% verificados
                     IsPrimary = false,
-                    CustomerId = customerId
+                    CustomerId = new CustomerId(customerId)
                 });
             }
         }
