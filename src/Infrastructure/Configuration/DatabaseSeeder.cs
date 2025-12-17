@@ -44,7 +44,7 @@ public static class DatabaseSeeder
             // Customer seed - use flattened properties for owned entity Name
             customerSeeds.Add(new
             {
-                Id = customerId,
+                Id = new CustomerId(customerId),
                 FirstName = firstName,
                 LastName = lastName,
                 Created = created,
