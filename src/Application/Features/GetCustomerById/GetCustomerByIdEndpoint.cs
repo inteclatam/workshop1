@@ -9,7 +9,7 @@ public static class GetCustomerByIdEndpoint
 {
     public static IEndpointRouteBuilder MapGetCustomerByIdEndpoint(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapGet("/api/customers/{id:long}", async (
+        endpoints.MapGet("/api/customers/{id}", async (
                 long id,
                 QueryDispatcher dispatcher,
                 CancellationToken cancellationToken) =>
