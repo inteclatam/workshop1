@@ -1,0 +1,26 @@
+{
+  "name": "customers",
+  "version": "1.0.0",
+  "description": "Este proyecto implementa una arquitectura basada en **Domain-Driven Design (DDD)** para la gestión de clientes, siguiendo los patrones tácticos y estratégicos de DDD.",
+  "homepage": "https://github.com/inteclatam/workshop1#readme",
+  "bugs": {
+    "url": "https://github.com/inteclatam/workshop1/issues"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/inteclatam/workshop1.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {
+    "commitizen": "^4.3.1"
+  }
+}
