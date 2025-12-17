@@ -44,9 +44,9 @@ public static class DatabaseSeeder
             // Customer seed - use flattened properties for owned entity Name
             customerSeeds.Add(new
             {
-                Id = new CustomerId(customerId),
-                Name_FirstName = firstName,
-                Name_LastName = lastName,
+                Id = customerId,
+                FirstName = firstName,
+                LastName = lastName,
                 Created = created,
                 CreatedBy = (int?)createdBy,
                 LastModified = (DateTime?)null,
@@ -65,13 +65,13 @@ public static class DatabaseSeeder
             contactSeeds.Add(new
             {
                 Id = primaryContactId,
-                Email_Value = primaryEmail,
-                PhoneNumber_Number = primaryPhoneNumber,
-                PhoneNumber_Prefix = primaryPhonePrefix,
-                PhoneNumber_Value = $"{primaryPhonePrefix}{primaryPhoneNumber}",
+                Email = primaryEmail,
+                PhoneNumber = primaryPhoneNumber,
+                PhonePrefix = primaryPhonePrefix,
+                PhoneValue = $"{primaryPhonePrefix}+{primaryPhoneNumber}",
                 IsVerified = faker.Random.Bool(0.7f), // 70% verificados para contacto principal
                 IsPrimary = true,
-                CustomerId = new CustomerId(customerId)
+                CustomerId = customerId
             });
 
             // Contactos adicionales (0-2 por customer)
@@ -86,13 +86,13 @@ public static class DatabaseSeeder
                 contactSeeds.Add(new
                 {
                     Id = additionalContactId,
-                    Email_Value = additionalEmail,
-                    PhoneNumber_Number = additionalPhoneNumber,
-                    PhoneNumber_Prefix = additionalPhonePrefix,
-                    PhoneNumber_Value = $"{additionalPhonePrefix}{additionalPhoneNumber}",
+                    Email = additionalEmail,
+                    PhoneNumber = additionalPhoneNumber,
+                    PhonePrefix = additionalPhonePrefix,
+                    PhoneValue = $"{additionalPhonePrefix}+{additionalPhoneNumber}",
                     IsVerified = faker.Random.Bool(0.3f), // 30% verificados
                     IsPrimary = false,
-                    CustomerId = new CustomerId(customerId)
+                    CustomerId = customerId
                 });
             }
         }
