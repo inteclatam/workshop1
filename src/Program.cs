@@ -1,6 +1,7 @@
 using Intec.Workshop1.Customers;
 using Intec.Workshop1.Customers.Application.Features.CreateCustomer;
 using Intec.Workshop1.Customers.Application.Features.GetCustomerById;
+using Intec.Workshop1.Customers.Infrastructure;
 using Intec.Workshop1.Customers.Infrastructure.Configuration;
 using Intec.Workshop1.Customers.Infrastructure.SnowflakeId;
 using Intec.Workshop1.Customers.Infrastructure.Exceptions;
@@ -41,7 +42,11 @@ var app = builder.Build();
 
 // Exception handling middleware
 app.UseExceptionHandler();
-
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<CustomersDbContext>();
+    await DatabaseSeederRuntime.SeedAsync(db);
+}
 
 
 app.MapOpenApi();

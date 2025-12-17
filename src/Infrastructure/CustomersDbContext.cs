@@ -17,6 +17,6 @@ public class CustomersDbContext(DbContextOptions<CustomersDbContext> options) : 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CustomersDbContext).Assembly);
 
         // Seed inicial de datos
-        DatabaseSeeder.SeedData(modelBuilder);
+       // DatabaseSeeder.SeedData(modelBuilder);
     }
 }
