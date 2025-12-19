@@ -14,6 +14,9 @@ public static class GetCustomerByIdEndpoint
                 QueryDispatcher dispatcher,
                 CancellationToken cancellationToken) =>
             {
+                
+                
+                
                 Guard.Against.NegativeOrZero(id, nameof(id));
 
                 var query = new GetCustomerByIdQuery(id);

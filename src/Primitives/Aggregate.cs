@@ -55,7 +55,7 @@ public class Aggregate<TId> : Entity<TId>, IAggregate<TId>, IHaveDomainEvents
     {
         if (rule.IsBroken())
         {
-            throw new BusinessRuleValidationException(rule);
+        //    throw new BusinessRuleValidationException(rule);
         }
     }
 }
