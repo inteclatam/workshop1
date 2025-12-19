@@ -1,6 +1,21 @@
 # Domain-Driven Design (DDD) - Customers
 <img src="https://img.shields.io/badge/.NET-5C2D91?style=badge&logo=.net&logoColor=white" >
+
 Este proyecto implementa una arquitectura basada en **Domain-Driven Design (DDD)** para la gestión de clientes, siguiendo los patrones tácticos y estratégicos de DDD.
+
+## 📋 Tabla de Contenidos
+
+- [Estructura del Proyecto](#estructura-del-proyecto)
+- [Capa de Primitives (Building Blocks)](#capa-de-primitives-building-blocks)
+- [Capa de Dominio](#capa-de-dominio-domain-layer)
+- [Capa de Infraestructura](#capa-de-infraestructura-infrastructure-layer)
+- [Capa de Aplicación](#capa-de-aplicación-application-layer)
+- [Domain Events](#domain-events)
+- [Logging y Observabilidad](#logging-y-observabilidad)
+- [Configuración con Variables de Entorno](#configuración-con-variables-de-entorno-env)
+- [Tecnologías y Librerías](#tecnologías-y-librerías)
+- [Ejecución del Proyecto](#ejecución-del-proyecto)
+- [Beneficios de Esta Arquitectura](#beneficios-de-esta-arquitectura-completa)
 
 ## Estructura del Proyecto
 
@@ -219,8 +234,8 @@ Abstracción de persistencia que trabaja con agregados completos.
 - Modificación solo a través de métodos de negocio
 - Invariantes protegidas
 
-### 7. Domain Events (preparado para)
-La infraestructura incluye `IHaveDomainEvents` para eventos de dominio.
+### 7. Domain Events
+Sistema completo de eventos de dominio para capturar eventos importantes del negocio.
 
 ### 8. Strongly Typed IDs
 Uso de `CustomerId` en lugar de `long` para type-safety.
@@ -408,6 +423,142 @@ Sistema de generación de IDs distribuidos basado en el algoritmo Snowflake de T
 - Los validadores se registran automáticamente desde el assembly
 - Integración con el pipeline de ASP.NET Core
 
+## Domain Events
+
+El proyecto implementa un sistema completo de eventos de dominio para capturar y comunicar eventos importantes del negocio.
+
+### Infraestructura de Domain Events
+
+**IDomainEvent**:
+- **Archivo**: `Primitives/IDomainEvent.cs`
+- **Propósito**: Interface base para todos los eventos de dominio
+- **Propiedades**:
+  - `EventId`: Identificador único del evento (Guid)
+  - `OccurredOn`: Timestamp de cuándo ocurrió el evento (DateTime UTC)
+
+**DomainEvent**:
+- **Archivo**: `Primitives/DomainEvent.cs`
+- **Propósito**: Clase base abstracta para eventos de dominio
+- **Características**:
+  - Genera automáticamente `EventId` único
+  - Registra timestamp de ocurrencia
+  - Herencia para todos los eventos específicos
+
+**IHaveDomainEvents**:
+- **Archivo**: `Primitives/IHaveDomainEvents.cs`
+- **Propósito**: Interface para agregados que publican eventos
+- **Métodos**:
+  - `GetDomainEvents()`: Obtiene eventos pendientes
+  - `ClearDomainEvents()`: Limpia eventos después de publicar
+  - `RaiseDomainEvent()`: Registra un nuevo evento
+
+**Aggregate (actualizado)**:
+- **Archivo**: `Primitives/Aggregate.cs`
+- **Propósito**: Clase base para agregados con soporte de eventos
+- **Características**:
+  - Lista interna de eventos de dominio
+  - Implementa `IHaveDomainEvents`
+  - Protege la colección de eventos (private set)
+
+### Eventos del Dominio de Customers
+
+El dominio de Customers publica los siguientes eventos:
+
+**CustomerCreatedEvent**:
+- **Archivo**: `Domain/Events/CustomerCreatedEvent.cs`
+- **Se dispara cuando**: Se crea un nuevo cliente
+- **Propiedades**: CustomerId, FirstName, LastName, Email, PhoneNumber
+
+**CustomerNameChangedEvent**:
+- **Archivo**: `Domain/Events/CustomerNameChangedEvent.cs`
+- **Se dispara cuando**: Se actualiza el nombre de un cliente
+- **Propiedades**: CustomerId, OldName, NewName
+
+**CustomerDeletedEvent**:
+- **Archivo**: `Domain/Events/CustomerDeletedEvent.cs`
+- **Se dispara cuando**: Se elimina (soft delete) un cliente
+- **Propiedades**: CustomerId
+
+**CustomerRestoredEvent**:
+- **Archivo**: `Domain/Events/CustomerRestoredEvent.cs`
+- **Se dispara cuando**: Se restaura un cliente eliminado
+- **Propiedades**: CustomerId
+
+**ContactInformationAddedEvent**:
+- **Archivo**: `Domain/Events/ContactInformationAddedEvent.cs`
+- **Se dispara cuando**: Se agrega información de contacto
+- **Propiedades**: CustomerId, ContactId, Email, PhoneNumber
+
+**ContactEmailUpdatedEvent**:
+- **Archivo**: `Domain/Events/ContactEmailUpdatedEvent.cs`
+- **Se dispara cuando**: Se actualiza el email de contacto
+- **Propiedades**: CustomerId, OldEmail, NewEmail
+
+**ContactPhoneUpdatedEvent**:
+- **Archivo**: `Domain/Events/ContactPhoneUpdatedEvent.cs`
+- **Se dispara cuando**: Se actualiza el teléfono de contacto
+- **Propiedades**: CustomerId, OldPhone, NewPhone
+
+**ContactVerifiedEvent**:
+- **Archivo**: `Domain/Events/ContactVerifiedEvent.cs`
+- **Se dispara cuando**: Se verifica el contacto de un cliente
+- **Propiedades**: CustomerId
+
+**ContactRemovedEvent**:
+- **Archivo**: `Domain/Events/ContactRemovedEvent.cs`
+- **Se dispara cuando**: Se elimina información de contacto
+- **Propiedades**: CustomerId, ContactId
+
+**PrimaryContactChangedEvent**:
+- **Archivo**: `Domain/Events/PrimaryContactChangedEvent.cs`
+- **Se dispara cuando**: Se cambia el contacto principal
+- **Propiedades**: CustomerId, OldContactId, NewContactId
+
+### Uso de Domain Events en el Aggregate
+
+```csharp
+public class Customer : Aggregate<CustomerId>
+{
+    public static Customer Create(...)
+    {
+        var customer = new Customer(...);
+
+        // Registrar evento de dominio
+        customer.RaiseDomainEvent(new CustomerCreatedEvent(
+            customer.Id.Value,
+            customer.Name.FirstName,
+            customer.Name.LastName,
+            customer.Email.Value,
+            customer.PhoneNumber?.ToString()
+        ));
+
+        return customer;
+    }
+
+    public void UpdateName(string firstName, string lastName)
+    {
+        var oldName = Name;
+        Name = new CustomerName(firstName, lastName);
+
+        // Registrar evento cuando cambia el nombre
+        RaiseDomainEvent(new CustomerNameChangedEvent(
+            Id.Value,
+            $"{oldName.FirstName} {oldName.LastName}",
+            Name.FullName
+        ));
+    }
+}
+```
+
+### Beneficios de Domain Events
+
+1. **Desacoplamiento**: Los agregados no necesitan conocer los efectos secundarios de sus acciones
+2. **Auditabilidad**: Todos los cambios importantes quedan registrados
+3. **Integraciones**: Otros bounded contexts pueden reaccionar a eventos
+4. **Event Sourcing Ready**: Base para implementar Event Sourcing si se necesita
+5. **Trazabilidad**: Historia completa de qué pasó en el dominio
+6. **Procesamiento Asíncrono**: Los eventos pueden procesarse de forma asíncrona
+
 ### Data Seeding
 
 **DatabaseSeeder**:
@@ -456,15 +607,77 @@ RegisterHandlers(services, typeof(IQueryHandler<,>));
 
 **Configuración**:
 - **Archivo**: `Program.cs`
-- **Sinks**: Spectre.Console (salida coloreada en consola)
+- **Sinks**:
+  - **Spectre.Console**: Salida coloreada y formateada en consola
+  - **Seq**: Plataforma de análisis y búsqueda de logs estructurados
 - **Características**:
   - Logging estructurado
   - Configuración desde appsettings.json
   - Integración con ASP.NET Core
+  - Enriquecimiento automático (MachineName, ProcessId, ThreadId, etc.)
+
+**Configuración Serilog en appsettings.Development.json**:
+```json
+{
+  "Serilog": {
+    "MinimumLevel": "Debug",
+    "Enrich": [
+      "FromLogContext",
+      "WithMachineName",
+      "WithEnvironmentName",
+      "WithProcessId",
+      "WithProcessName",
+      "WithThreadId"
+    ],
+    "WriteTo": [
+      {
+        "Name": "Spectre",
+        "Args": {
+          "outputTemplate": "[{Timestamp:HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+        }
+      },
+      {
+        "Name": "Seq",
+        "Args": {
+          "serverUrl": "http://localhost:5341",
+          "apiKey": ""
+        }
+      }
+    ]
+  }
+}
+```
 
 **Logging en Handlers**:
 ```csharp
 _logger.LogInformation("Creating customer with ID: {CustomerId}", customerId);
+```
+
+### Seq - Structured Log Server
+
+**Seq** es una plataforma de análisis de logs que permite:
+- Búsqueda y filtrado avanzado de logs
+- Visualización de logs estructurados
+- Análisis en tiempo real
+- Alertas y notificaciones
+- Dashboards personalizados
+
+**Configuración**:
+- **URL por defecto**: `http://localhost:5341`
+- **Paquete NuGet**: `Serilog.Sinks.Seq`
+- **Integración**: Automática mediante configuración
+
+**Ejecutar Seq con Docker**:
+```bash
+docker run --name seq -d --restart unless-stopped \
+  -e ACCEPT_EULA=Y \
+  -p 5341:80 \
+  datalust/seq:latest
+```
+
+**Acceso a UI de Seq**:
+```
+http://localhost:5341
 ```
 
 ### Spectre.Console
@@ -543,7 +756,11 @@ GET /scalar/v1
 - `Serilog.Extensions.Hosting` (10.0.0): Integración hosting
 - `Serilog.Settings.Configuration` (10.0.0): Configuración
 - `Serilog.Sinks.Spectre` (0.5.0): Sink para Spectre.Console
+- `Serilog.Sinks.Seq` (9.0.0): Sink para servidor Seq
 - `Spectre.Console` (0.54.0): Consola rica y colorida
+
+**Configuración**:
+- `DotNetEnv` (3.1.1): Soporte para archivos .env
 
 **Testing & Data Generation**:
 - `Bogus` (35.6.1): Generación de datos falsos
@@ -586,12 +803,15 @@ GET /scalar/v1
 - **CQRS Pattern**: Separación de Commands y Queries
 - **Unit of Work Pattern**: Gestión transaccional
 - **Dispatcher Pattern**: Mediación entre endpoints y handlers
+- **Domain Events Pattern**: Eventos de dominio para comunicación entre agregados
 - **Global Exception Handling**: Manejo centralizado de errores
 - **Dependency Injection**: IoC container para todas las dependencias
 - **Distributed ID Generation**: Snowflake algorithm
 - **Data Seeding**: Generación automatizada de datos de prueba
-- **Structured Logging**: Serilog con logging estructurado
+- **Structured Logging**: Serilog con logging estructurado y Seq
 - **API Documentation**: OpenAPI/Scalar para documentación interactiva
+- **Environment Configuration**: Dotenv para configuración flexible
+- **Web Server Configuration**: Kestrel con puerto configurable
 
 ## Flujo de Trabajo Completo: Crear un Customer
 
@@ -693,6 +913,57 @@ public async Task<int> SaveChangesAsync(CancellationToken ct)
 }
 ```
 
+## Configuración con Variables de Entorno (.env)
+
+El proyecto soporta configuración mediante archivos `.env` para facilitar el desarrollo local y el despliegue.
+
+### Soporte de DotEnv
+
+**Paquete**: `DotNetEnv`
+- **Propósito**: Cargar variables de entorno desde archivos .env
+- **Ubicación de archivos**:
+  - `src/.env`: Configuración de desarrollo local
+  - `deploy/.env`: Configuración de despliegue
+
+**Archivo src/.env**:
+```bash
+KESTREL_PORT=5002
+APP_NAME=CUSTOMERS
+```
+
+**Carga en Program.cs**:
+```csharp
+// Cargar variables de entorno desde archivo .env
+DotNetEnv.Env.Load();
+```
+
+### Configuración de Kestrel
+
+El servidor web Kestrel se configura mediante variables de entorno:
+
+**Puerto Configurable**:
+- Variable de entorno: `KESTREL_PORT`
+- Puerto por defecto: `5002`
+- Permite cambiar el puerto sin modificar código
+
+**Configuración en Program.cs**:
+```csharp
+builder.WebHost.ConfigureKestrel(options =>
+{
+    var port = Environment.GetEnvironmentVariable("KESTREL_PORT");
+    if (!string.IsNullOrEmpty(port) && int.TryParse(port, out var portNumber))
+    {
+        options.ListenAnyIP(portNumber);
+    }
+});
+```
+
+**Ventajas**:
+- Configuración flexible por entorno
+- Sin hardcodear puertos en el código
+- Facilita despliegues en contenedores
+- Compatible con orquestadores (Docker, Kubernetes)
+
 ## Configuración del Proyecto
 
 ### appsettings.json
@@ -721,6 +992,7 @@ public async Task<int> SaveChangesAsync(CancellationToken ct)
 ### Prerequisitos
 - .NET 10.0 SDK
 - PostgreSQL 15+
+- Docker (opcional, para Seq)
 
 ### Comandos
 ```bash
@@ -730,15 +1002,38 @@ dotnet restore
 # Ejecutar migraciones
 dotnet ef database update
 
+# Opcional: Iniciar Seq para logs (con Docker)
+docker run --name seq -d --restart unless-stopped \
+  -e ACCEPT_EULA=Y \
+  -p 5341:80 \
+  datalust/seq:latest
+
 # Ejecutar proyecto
 dotnet run
 
+# El puerto se configura desde src/.env (KESTREL_PORT=5002)
+# Acceder a la aplicación: http://localhost:5002
+
 # Acceder a documentación API
-# https://localhost:5001/scalar/v1
+# http://localhost:5002/scalar/v1
+
+# Acceder a Seq (logs)
+# http://localhost:5341
 
 # Seed de datos (Development)
-# POST https://localhost:5001/seed
+# POST http://localhost:5002/seed
 ```
+
+### Variables de Entorno
+
+El proyecto usa un archivo `.env` en `src/.env` para configuración local:
+
+```bash
+KESTREL_PORT=5002        # Puerto del servidor web
+APP_NAME=CUSTOMERS        # Nombre de la aplicación
+```
+
+Puedes modificar estas variables según tus necesidades sin tocar el código.
 
 ## Beneficios de Esta Arquitectura Completa
 
@@ -746,13 +1041,46 @@ dotnet run
 2. **Testabilidad Extrema**: Todas las dependencias son inyectadas e intercambiables
 3. **Mantenibilidad**: Cambios aislados por capa y feature
 4. **Escalabilidad**: CQRS permite escalar lectura y escritura independientemente
-5. **Observabilidad**: Logging estructurado y manejo de errores centralizado
-6. **Consistencia**: Unit of Work garantiza transacciones ACID
-7. **Performance**: IDs distribuidos sin dependencia de secuencias de BD
-8. **Documentación**: OpenAPI generada automáticamente
-9. **Validación Robusta**: FluentValidation con reglas expresivas
-10. **Developer Experience**: Scalar UI para explorar y probar la API
+5. **Observabilidad Avanzada**: Logging estructurado con Serilog y Seq para análisis en tiempo real
+6. **Trazabilidad Completa**: Domain Events capturan todos los cambios importantes del negocio
+7. **Consistencia**: Unit of Work garantiza transacciones ACID
+8. **Performance**: IDs distribuidos sin dependencia de secuencias de BD
+9. **Documentación**: OpenAPI generada automáticamente
+10. **Validación Robusta**: FluentValidation con reglas expresivas
+11. **Developer Experience**: Scalar UI para explorar y probar la API
+12. **Configuración Flexible**: Variables de entorno con dotenv para diferentes ambientes
+13. **Desacoplamiento**: Domain Events permiten reaccionar a cambios sin acoplar código
+14. **Auditabilidad**: Eventos de dominio proporcionan historia completa de cambios
+15. **Portabilidad**: Configuración con variables de entorno facilita despliegues
 
 ## Conclusión
 
-Este proyecto demuestra una implementación completa de Domain-Driven Design con arquitectura en capas, aplicando patrones tácticos y estratégicos modernos. La incorporación de CQRS, Unit of Work, generación distribuida de IDs, manejo global de excepciones, validación fluida y logging estructurado resulta en un código altamente mantenible, testeable, observable y que refleja fielmente las reglas del negocio. La separación clara entre dominio, aplicación e infraestructura, junto con la inyección de dependencias y los dispatchers CQRS, permite evolucionar el sistema de manera sostenible y escalable.
+Este proyecto demuestra una implementación completa de **Domain-Driven Design** con arquitectura en capas, aplicando patrones tácticos y estratégicos modernos.
+
+### Características Principales:
+
+**Patrones de Dominio**:
+- **CQRS** para separación de responsabilidades
+- **Domain Events** para comunicación desacoplada entre agregados
+- **Unit of Work** para consistencia transaccional
+- **Repository Pattern** para abstracción de persistencia
+
+**Infraestructura Robusta**:
+- **Snowflake ID Generation** para IDs distribuidos de alto rendimiento
+- **Serilog con Seq** para observabilidad y análisis de logs en tiempo real
+- **FluentValidation** para validación expresiva y mantenible
+- **Global Exception Handling** para manejo centralizado de errores
+
+**Configuración Flexible**:
+- **DotEnv** para configuración por entorno
+- **Kestrel** con puerto configurable
+- **Múltiples sinks de logging** (Console y Seq)
+
+**Calidad de Código**:
+- Separación clara entre dominio, aplicación e infraestructura
+- Inyección de dependencias en todos los niveles
+- Logging estructurado y trazable
+- Eventos de dominio para auditabilidad completa
+- Validación en múltiples capas
+
+El resultado es un **código altamente mantenible, testeable, observable y escalable** que refleja fielmente las reglas del negocio y permite evolucionar el sistema de manera sostenible. La incorporación de Domain Events y observabilidad avanzada con Seq proporciona trazabilidad completa de todos los cambios en el sistema, facilitando debugging, auditoría y análisis de comportamiento.
