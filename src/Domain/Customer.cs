@@ -1,3 +1,4 @@
+using Intec.Workshop1.Customers.Domain.Events;
 using Intec.Workshop1.Customers.Domain.ValueObjects;
 using Intec.Workshop1.Customers.Primitives;
 
@@ -54,6 +55,9 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
         // Agregar contacto principal
         customer.AddContactInformation(contactId, email, phoneNumber, isPrimary: true);
 
+        // Raise domain event
+        customer.AddDomainEvent(new CustomerCreatedEvent(id, firstName, lastName, email, phoneNumber));
+
         return customer;
     }
 
@@ -61,8 +65,14 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
 
     public void UpdateName(string firstName, string lastName, int? userId = null)
     {
+        var oldFirstName = Name.FirstName;
+        var oldLastName = Name.LastName;
+
         Name = new CustomerName(firstName, lastName);
         Touch(userId);
+
+        // Raise domain event
+        AddDomainEvent(new CustomerNameChangedEvent(Id.Value, oldFirstName, oldLastName, firstName, lastName));
     }
 
     public ContactInformation AddContactInformation(long contactId, string email, string phoneNumber, bool isPrimary = false, int? userId = null)
@@ -89,6 +99,12 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
         _contactInformations.Add(contactInfo);
         Touch(userId);
 
+        // Raise domain event (only when not creating the customer)
+        if (_contactInformations.Count > 1 || !isPrimary)
+        {
+            AddDomainEvent(new ContactInformationAddedEvent(Id.Value, contactId, email, phoneNumber, isPrimary));
+        }
+
         return contactInfo;
     }
 
@@ -98,8 +114,12 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
         if (contact == null)
             throw new InvalidOperationException($"Contact information with id {contactId} not found");
 
+        var oldEmail = contact.Email.Value;
         contact.UpdateEmailAddress(email);
         Touch(userId);
+
+        // Raise domain event
+        AddDomainEvent(new ContactEmailUpdatedEvent(Id.Value, contactId, oldEmail, email));
     }
 
     public void UpdateContactPhoneNumber(long contactId, string phoneNumber, int? userId = null)
@@ -108,8 +128,12 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
         if (contact == null)
             throw new InvalidOperationException($"Contact information with id {contactId} not found");
 
+        var oldPhoneNumber = contact.PhoneNumber.Value;
         contact.UpdatePhonenumber(phoneNumber);
         Touch(userId);
+
+        // Raise domain event
+        AddDomainEvent(new ContactPhoneUpdatedEvent(Id.Value, contactId, oldPhoneNumber, phoneNumber));
     }
 
     public void SetPrimaryContact(long contactId, int? userId = null)
@@ -117,6 +141,9 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
         var contact = _contactInformations.FirstOrDefault(c => c.Id == contactId);
         if (contact == null)
             throw new InvalidOperationException($"Contact information with id {contactId} not found");
+
+        // Obtener el contacto primario anterior
+        var previousPrimaryContact = _contactInformations.FirstOrDefault(c => c.IsPrimary);
 
         // Desmarcar todos los contactos como primarios
         foreach (var c in _contactInformations)
@@ -127,6 +154,9 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
         // Marcar el nuevo contacto como primario
         contact.SetAsPrimary();
         Touch(userId);
+
+        // Raise domain event
+        AddDomainEvent(new PrimaryContactChangedEvent(Id.Value, previousPrimaryContact?.Id, contactId));
     }
 
     public void VerifyContact(long contactId, int? userId = null)
@@ -137,6 +167,9 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
 
         contact.Verify();
         Touch(userId);
+
+        // Raise domain event
+        AddDomainEvent(new ContactVerifiedEvent(Id.Value, contactId));
     }
 
     public void RemoveContactInformation(long contactId, int? userId = null)
@@ -150,8 +183,14 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
             throw new InvalidOperationException("Cannot remove primary contact. Set another contact as primary first.");
         }
 
+        var email = contact.Email.Value;
+        var phoneNumber = contact.PhoneNumber.Value;
+
         _contactInformations.Remove(contact);
         Touch(userId);
+
+        // Raise domain event
+        AddDomainEvent(new ContactRemovedEvent(Id.Value, contactId, email, phoneNumber));
     }
 
     public void SoftDelete(int? userId = null)
@@ -161,6 +200,9 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
         IsDeleted = true;
         Deleted = DateTime.UtcNow;
         DeletedBy = userId;
+
+        // Raise domain event
+        AddDomainEvent(new CustomerDeletedEvent(Id.Value));
     }
 
     public void Restore(int? userId = null)
@@ -171,6 +213,9 @@ public class Customer : Aggregate<CustomerId>, IHaveAudit, IHaveSoftDelete
         Deleted = null;
         DeletedBy = null;
         Touch(userId);
+
+        // Raise domain event
+        AddDomainEvent(new CustomerRestoredEvent(Id.Value));
     }
 
     private void Touch(int? userId)
