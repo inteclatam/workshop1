@@ -3,6 +3,10 @@ using dotenv.net;
 using Intec.Workshop1.Customers;
 using Intec.Workshop1.Customers.Application.Features.CreateCustomer;
 using Intec.Workshop1.Customers.Application.Features.GetCustomerById;
+using Intec.Workshop1.Customers.Application.Features.GetAllCustomers;
+using Intec.Workshop1.Customers.Application.Features.UpdateCustomer;
+using Intec.Workshop1.Customers.Application.Features.ChangeCustomerName;
+using Intec.Workshop1.Customers.Application.Features.DeleteCustomer;
 using Intec.Workshop1.Customers.Infrastructure;
 using Intec.Workshop1.Customers.Infrastructure.Configuration;
 using Intec.Workshop1.Customers.Infrastructure.SnowflakeId;
@@ -145,6 +149,10 @@ app.MapOpenApi();
 
 app.MapCreateCustomerEndpoint();
 app.MapGetCustomerByIdEndpoint();
+app.MapGetAllCustomersEndpoint();
+app.MapUpdateCustomerEndpoint();
+app.MapChangeCustomerNameEndpoint();
+app.MapDeleteCustomerEndpoint();
 
 
 app.Run();
